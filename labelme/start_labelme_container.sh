@@ -1,7 +1,16 @@
 #!/bin/bash
+
+echo "Starting labelme docker container!"
+echo "Note:"
+echo "*  This script will create the following directories $1/Images $1/Annotations $1/Masks $1/Scribbles $1/DirLists"
+echo "*  The storage volumes are mounted outside the containers inside the parent directory $1 specified."
+echo "*  This will delete the data in Images, Masks, Scribbles, Annotations, DirLists."
+echo "*  Thus the default address will raise an error: ERROR IN FETCH IMAGE"
+echo "*  To correct this error, manually add the example folders given in the official github repository to the folders created above!"
 if ["$1" == ""]
     then
-    echo "must be envoked only with the path to the directory which will act as storage for LabelMe"
+    echo "ERROR! No Argument Specified!"
+    echo "must be envoked only with 1 argument: The path to the directory which will act as storage for LabelMe outside the container"
     exit 1
 fi
 
