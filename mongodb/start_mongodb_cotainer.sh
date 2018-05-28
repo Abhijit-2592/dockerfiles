@@ -11,6 +11,7 @@ if ["$1" == ""]
 fi
 mkdir -p $1
 docker run \
+--restart unless-stopped \
 --name mongodb_database \
 -p 27017:27017 \
 -d \

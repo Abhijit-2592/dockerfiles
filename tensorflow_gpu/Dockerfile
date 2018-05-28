@@ -1,15 +1,10 @@
-#building docker image for tensorflow gpu from scratch
-FROM ubuntu:16.04
-LABEL maintainer="abhijit balaji"
-LABEL email="balaabhijit5@gmail.com"
-LABEL version="v1"
+ARG cuda_version=9.0
+ARG cudnn_version=7
+FROM nvidia/cuda:${cuda_version}-cudnn${cudnn_version}-devel
 
-# update and configure
+# Install system packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
       bzip2 \
-      unzip \
-      python-pydot \
-      python-pydot-ng \
       g++ \
       git \
       graphviz \
@@ -19,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       wget && \
     rm -rf /var/lib/apt/lists/*
 
-# Install miniconda
+    # Install conda
 ENV CONDA_DIR /opt/conda
 ENV PATH $CONDA_DIR/bin:$PATH
 
@@ -27,64 +22,47 @@ RUN wget --quiet --no-check-certificate https://repo.continuum.io/miniconda/Mini
     echo "c59b3dd3cad550ac7596e0d599b91e75d88826db132e4146030ef471bb434e9a *Miniconda3-4.2.12-Linux-x86_64.sh" | sha256sum -c - && \
     /bin/bash /Miniconda3-4.2.12-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
     rm Miniconda3-4.2.12-Linux-x86_64.sh && \
+    echo export PATH=$CONDA_DIR/bin:'$PATH' > /etc/profile.d/conda.sh
 
-# install python
-RUN conda install -y python=3.6
+# change username
+ENV NB_USER abhijit
 
-# upgrade pip
+RUN useradd -m -s /bin/bash -N $NB_USER
+RUN chown $NB_USER $CONDA_DIR -R
+COPY jupyter_notebook_config.py /
+RUN chown $NB_USER jupyter_notebook_config.py # thus the user can accerss the config file
+RUN mkdir /abhijit_home
+RUN chown $NB_USER -R /abhijit_home
+
+USER $NB_USER
+
+
+# Install Python packages and keras
+ARG python_version=3.6
+
+RUN conda install -y python=${python_version}
 RUN pip install --upgrade pip
-
-# install other important libraries
-RUN conda install -y Pillow  \
-                     scikit-learn \
-                     scikit-image \
-                     notebook \
-                     matplotlib \
-                     mkl \
-                     nose \
-                     pyyaml \
-                     six \
-                     h5py \
-                     bokeh \
-                     scipy \
-                     numpy \
-                     pygpu \
-                     six \
-                     pandas=0.20.2
-
-RUN conda install -c -y anaconda pymongo=3.4.0
-RUN conda install -c -y conda-forge opencv=3.4.1 \
-                                    jupyterlab \
-                                    protobuf=3.4.0
-
-# Install Tensorflow-gpu : followed from official guide.
-# Install CUDA and CUDNN using conda
-RUN conda install -c anaconda cudatoolkit=9.0 \
-                              cudnn=7.0.5
-# hold the cudnn version at 7.0.5 because tensorflow recommends version 7.0
-RUN apt-mark hold libcudnn7 libcudnn7-dev
-# to unhold use RUN apt-mark unhold libcudnn7 libcudnn7-dev
-
-# install nvidia driver, the below number 387 is GPU specific, works for GTX-1060 and other GTX-10Series
-RUN apt install nvidia-387
-# The libcupti-dev library for advanced profiling
-RUN apt install cuda-command-line-tools
-RUN export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+${LD_LIBRARY_PATH}:}/usr/local/cuda/extras/CUPTI/lib64
-# actual installation of tensorflow-GPU
-conda install -y -c anaconda tensorflow-gpu=1.7.0
-# install keras
-conda install -y -c conda-forge keras=2.1.5
-
-#install keras vis
+RUN pip install tensorflow-gpu==1.7.1
+RUN conda install Pillow scikit-learn scikit-image matplotlib mkl nose pyyaml six h5py bokeh scipy numpy
+RUN conda install pandas=0.20.2
+RUN pip install keras==2.1.4
 RUN pip install keras-vis==0.4.1
-# clean up
-RUN  conda clean -yt
+RUN pip install opencv-python==3.4.1.15
 
-ENV PYTHONPATH='/src/:$PYTHONPATH'
-ADD run_jupyter.sh /root/run_jupyter.sh
-ADD jupyter_notebook_config.py /root/.jupyter/jupyter_notebook_config.py
+RUN conda install -c conda-forge jupyterlab \
+                                 pymongo=3.6.1
 
-# expose 8888 for jupyter-lab, 6006 for tensorboard, 27017 for mongodb
+RUN conda install -c anaconda protobuf=3.4.0
+
+RUN conda clean -yt
+
+#ENV PYTHONPATH='/src/:$PYTHONPATH'
+
+# RUN mkdir /start_jupyter
+# COPY run_jupyter.sh /start_jupyter
+#COPY jupyter_notebook_config.py /root/.jupyter/
 EXPOSE 8888 6006 27017
 
-CMD /root/run_jupyter.sh
+WORKDIR /abhijit_home
+# CMD jupyter lab "$@" --no-browser --allow-root --port=8888 --ip=0.0.0.0
+CMD jupyter lab --config=/jupyter_notebook_config.py --no-browser --port=8888 --ip=0.0.0.0

@@ -19,6 +19,8 @@ docker run \
 -t labelme
 
 # change ownership so that labelme can modify documents in mounted volumes
-docker exec labelme chown -R www-data:www-data /var/www/html
+docker exec -u root labelme chown -R abhijit:www-data /var/www/html
+docker exec -u root labelme chmod -R 774 /var/www/html
+
 # restart apache inside the container
-docker exec labelme service apache2 restart
+docker exec -u root labelme service apache2 restart

@@ -18,13 +18,16 @@ if ["$1" == ""]
     exit 1
 fi
 
-docker run \
+# here connect to mongodb using data_mongo, 27017
+mkdir -p $1/data $1/workspace $1/source_code $1/others
+nvidia-docker run \
 --name tf_keras \
---user root -d \
---link mongodb_database \
--v $1/source_code:/source_code \
--v $1/data:/data \
--v $1/workspace:/workspace \
--v $others:/others
+--link mongodb_database:data_mongo \
+-e DISPLAY=$DISPLAY \
+-v /tmp/.X11-unix:/tmp/.X11-unix \
+-v $1/source_code:/abhijit_home/source_code \
+-v $1/data:/abhijit_home/data \
+-v $1/workspace:/abhijit_home/workspace \
+-v $1/others:/abhijit_home/others \
 -p 8888:8888 -p 6006:6006 \
-tensorflow_gpu_v1 /root/run_jupyter.sh
+tensorflow_gpu_v1
