@@ -7,4 +7,4 @@ Dockerfiles for setting up deep learning environment in **Ubuntu 16.04**
 
 * [mongodb](./mongodb): Builds the MongoDB docker container from the official image.
 
-* [tensorflow-gpu](./tensorflow-gpu): Builds the tensorflow-gpu docker container.
+* [tensorflow_gpu](./tensorflow_gpu): Builds the tensorflow-gpu docker container.

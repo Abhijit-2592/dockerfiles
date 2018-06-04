@@ -25,9 +25,6 @@ nvidia-docker run \
 --link mongodb_database:data_mongo \
 -e DISPLAY=$DISPLAY \
 -v /tmp/.X11-unix:/tmp/.X11-unix \
--v $1/source_code:/abhijit_home/source_code \
--v $1/data:/abhijit_home/data \
--v $1/workspace:/abhijit_home/workspace \
--v $1/others:/abhijit_home/others \
+-v $1:/abhijit_home \
 -p 8888:8888 -p 6006:6006 \
 tensorflow_gpu_v1
