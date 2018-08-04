@@ -16,8 +16,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Tensorflow 1.7.1 is not compatible with CUDNN 7.1.04 thus down grade it to 7.0.5
 RUN apt-get update && apt-get install -y --allow-downgrades --no-install-recommends \
-    libcudnn7=7.0.5.15-1+cuda9.1 \
-    libcudnn7-dev=7.0.5.15-1+cuda9.1 && \
+    libcudnn7=7.0.5.15-1+cuda9.0 \
+    libcudnn7-dev=7.0.5.15-1+cuda9.0 && \
     rm -rf /var/lib/apt/lists/*
 
     # Install conda
