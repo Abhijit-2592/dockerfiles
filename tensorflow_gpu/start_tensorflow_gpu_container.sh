@@ -2,7 +2,7 @@
 # @Author: abhijit
 # @Date:   24-May-2018 17-05-74
 # @Last modified by:   abhijit
-# @Last modified time: 24-May-2018 17-05-63
+# @Last modified time: 2018-09-15T00:15:41+05:30
 
 echo " "
 echo "the following directories will be created and mounted to the container."
@@ -18,13 +18,9 @@ if ["$1" == ""]
     exit 1
 fi
 
-# here connect to mongodb using data_mongo, 27017
 mkdir -p $1/data $1/workspace $1/source_code $1/others
 nvidia-docker run \
---name tf_keras \
---link mongodb_database:data_mongo \
--e DISPLAY=$DISPLAY \
--v /tmp/.X11-unix:/tmp/.X11-unix \
--v $1:/abhijit_home \
--p 8888:8888 -p 6006:6006 \
-tensorflow_gpu_v1
+--name tf_container \
+-v $1:/home/abhijit/deep_learning \
+-p 8889:8888 -p 6009:6006 \
+tensorflow_gpu:v1
