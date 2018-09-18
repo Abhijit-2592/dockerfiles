@@ -5,7 +5,7 @@ FROM nvidia/cuda:${cuda_version}-cudnn${cudnn_version}-devel
 # An ARG declared before a FROM is outside of a build stage, so it can’t be used in any instruction after a FROM
 # Thus declare args here
 ARG username=tf_user
-ARG userid=1001
+ARG userid=10001
 RUN echo "building image with username: ${username}, userid: ${userid}"
 # Install system packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
