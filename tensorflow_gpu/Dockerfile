@@ -27,7 +27,7 @@ RUN apt-get update
 RUN apt install -y tesseract-ocr libtesseract-dev
 
 # Tensorflow 1.8.0 is not compatible with CUDNN 7.1.04 thus down grade it to 7.0.5
-RUN apt-get update && apt-get install -y --allow-downgrades --no-install-recommends \
+RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-packages --no-install-recommends \
     libcudnn7=7.0.5.15-1+cuda9.0 \
     libcudnn7-dev=7.0.5.15-1+cuda9.0 && \
     rm -rf /var/lib/apt/lists/*
@@ -55,7 +55,7 @@ ARG python_version=3.6
 RUN conda install -y python=${python_version}
 RUN pip install --upgrade pip
 RUN pip install pytesseract
-RUN pip install tensorflow-gpu==1.8.0
+RUN pip install tensorflow-gpu==1.9.0
 RUN conda install Pillow scikit-learn scikit-image mkl nose pyyaml six h5py bokeh scipy numpy
 RUN conda install pandas=0.20.2
 RUN pip install keras==2.1.4
